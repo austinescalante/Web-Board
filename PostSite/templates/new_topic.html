@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Start a New Topic{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a></li>
+  <li class="breadcrumb-item active">New topic</li>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+      <!--Django protects all POST requests using a CSRF Token (Cross-Site Request Forgery Token). 
+     It’s a security measure to avoid external sites or applications to submit data to our application.-->
+    {% csrf_token %}
+    <div class="form-group">
+<!--We have to set the name of the HTML inputs. The name will be used to retrieve the data on the server side.
+<input type="text" class="form-control" id="id_subject" name="subject">
+<textarea class="form-control" id="id_message" name="message" rows="5"></textarea>
+Here is how we retrieve the data:
+subject = request.POST['subject']
+message = request.POST['message']-->
+      <label for="id_subject">Subject</label>
+      <input type="text" class="form-control" id="id_subject" name="subject">
+    </div>
+    <div class="form-group">
+      <label for="id_message">Message</label>
+      <textarea class="form-control" id="id_message" name="message" rows="5"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Post</button>
+  </form>
+{% endblock %}
