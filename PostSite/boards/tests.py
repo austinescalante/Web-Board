@@ -1,8 +1,9 @@
 from django.urls import reverse
 from django.test import TestCase
 from django.urls import resolve
-from .models import Board
+from .models import Board,Topic,Post
 from .views import home,board_topics,new_topic
+from django.contrib.auth.models import User
 
 # Create your tests here.
 
@@ -69,6 +70,17 @@ class BoardTopicsTest(TestCase):
         self.assertContains(response,'href="{0}"'.format(homepage_url))
 
 
+    #Test user new topic page
+    def test_board_topics_view_contains_navigation_links(self):
+        board_topics_url=reverse('board_topics',kwargs={'pk':1})
+        homepage_url=reverse('home')
+        new_topic_url=reverse('new_topic',kwargs={'pk':1})
+
+        response=self.client.get(board_topics_url)
+        self.assertContains(response,'href="{0}'.format(homepage_url))
+        self.assertContains(response,'href="{0}'.format(new_topic_url))
+
+
 #setUp: creates a Board instance to be used during the tests
 #test_new_topic_view_success_status_code: check if the request to the view is successful
 #test_new_topic_view_not_found_status_code: check if the view is raising a 404 error when the Board does not exist
@@ -77,6 +89,8 @@ class BoardTopicsTest(TestCase):
 class NewTopicTests(TestCase):
     def setUp(self):
         Board.objects.create(name='Django', description='Django board.')
+        #Added for the new topic view
+        User.objects.create_user(username='John',email='john@gmail.com',password='1234')
 
     def test_new_topic_view_success_status_code(self):
         url = reverse('new_topic', kwargs={'pk': 1})
@@ -97,4 +111,54 @@ class NewTopicTests(TestCase):
         board_topics_url = reverse('board_topics', kwargs={'pk': 1})
         response = self.client.get(new_topic_url)
         self.assertContains(response, 'href="{0}"'.format(board_topics_url))
+    #New Test for New Topic Page:
+
+    #Up: included the User.objects.create_user to create a User instance to be used in the tests
+    #test_csrf: since the CSRF Token is a fundamental part of processing POST requests, we have to make sure our HTML contains the token.
+    #test_new_topic_valid_post_data: sends a valid combination of data and check if the view created a Topic instance and a Post instance.
+    #test_new_topic_invalid_post_data: here we are sending an empty dictionary to check how the application is behaving.
+    #test_new_topic_invalid_post_data_empty_fields: similar to the previous test, but this time we are sending some data. 
+    #The application is expected to validate and reject empty subject and message
+    def test_crf(self):
+        url=reverse('new_topic',kwargs={'pk':1})
+        response=self.client.get(url)
+        self.assertContains(response, 'csrfmiddlewaretoken')
+    
+    def test_new_topic_valid_post_data(self):
+        url = reverse('new_topic', kwargs={'pk': 1})
+        data = {
+            'subject': 'Test title',
+            'message': 'Lorem ipsum dolor sit amet'
+        }
+        response = self.client.post(url, data)
+        self.assertTrue(Topic.objects.exists())
+        self.assertTrue(Post.objects.exists())
+
+
+    def test_new_topic_invalid_post_data(self):
+        '''
+        Invalid post data should not redirect
+        The expected behavior is to show the form again with validation errors
+        '''
+        url = reverse('new_topic', kwargs={'pk': 1})
+        response = self.client.post(url, {})
+        self.assertEquals(response.status_code, 200)
+    
+    def test_new_topic_invalid_post_data_empty_fields(self):
+        '''
+        Invalid post data should not redirect
+        The expected behavior is to show the form again with validation errors
+        '''
+        url = reverse('new_topic', kwargs={'pk': 1})
+        data = {
+            'subject': '',
+            'message': ''
+        }
+        response = self.client.post(url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertFalse(Topic.objects.exists())
+        self.assertFalse(Post.objects.exists())
+
+
+
 

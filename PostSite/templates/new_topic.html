@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load widget_tweaks %}
+
 {% block title %}Start a New Topic{% endblock %}
 
 {% block breadcrumb %}
@@ -9,24 +11,40 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-      <!--Django protects all POST requests using a CSRF Token (Cross-Site Request Forgery Token). 
-     It’s a security measure to avoid external sites or applications to submit data to our application.-->
+  <form method="post" novalidate>
     {% csrf_token %}
-    <div class="form-group">
-<!--We have to set the name of the HTML inputs. The name will be used to retrieve the data on the server side.
-<input type="text" class="form-control" id="id_subject" name="subject">
-<textarea class="form-control" id="id_message" name="message" rows="5"></textarea>
-Here is how we retrieve the data:
-subject = request.POST['subject']
-message = request.POST['message']-->
-      <label for="id_subject">Subject</label>
-      <input type="text" class="form-control" id="id_subject" name="subject">
-    </div>
-    <div class="form-group">
-      <label for="id_message">Message</label>
-      <textarea class="form-control" id="id_message" name="message" rows="5"></textarea>
-    </div>
+
+    {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {% if form.is_bound %}
+        <!--Field Validation:
+        Initial state: the form has no data (is not bound)
+        Invalid: we add the .is-invalid CSS class and add error messages in an element with a class .invalid-feedback. 
+        The form field and the messages are rendered in red.
+        Valid: we add the .is-valid CSS class so to paint the form field in green, giving feedback to the user that this field is good to go.-->
+        {% if field.errors %}
+          {% render_field field class="form-control is-invalid" %}
+          {% for error in field.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+
+        {% else %}
+          {% render_field field class="form-control is-valid" %}
+        {% endif %}
+      {% else %}
+        {% render_field field class="form-control" %}
+      {% endif %}
+        {% if field.help_text %}
+          <small class="form-text text-muted">
+            {{ field.help_text }}
+          </small>
+        {% endif %}
+      </div>
+    {% endfor %}
+
     <button type="submit" class="btn btn-success">Post</button>
   </form>
 {% endblock %}
