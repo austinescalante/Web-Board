@@ -1,32 +1,25 @@
-{% load widget_tweaks %}
+{% load form_tags widget_tweaks %}
+
+{% if form.non_field_errors %}
+  <div class="alert alert-danger" role="alert">
+    {% for error in form.non_field_errors %}
+      <p{% if forloop.last %} class="mb-0"{% endif %}>{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
 
 {% for field in form %}
   <div class="form-group">
     {{ field.label_tag }}
-<!--Field Validation:
-        Initial state: the form has no data (is not bound)
-        Invalid: we add the .is-invalid CSS class and add error messages in an element with a class .invalid-feedback. 
-        The form field and the messages are rendered in red.
-        Valid: we add the .is-valid CSS class so to paint the form field in green, giving feedback to the user that this field is good to go.-->
-    {% if form.is_bound %}
-      {% if field.errors %}
-        {% render_field field class="form-control is-invalid" %}
-        {% for error in field.errors %}
-          <div class="invalid-feedback">
-            {{ error }}
-          </div>
-        {% endfor %}
-      {% else %}
-        {% render_field field class="form-control is-valid" %}
-      {% endif %}
-    {% else %}
-      {% render_field field class="form-control" %}
-    {% endif %}
-
+    {% render_field field class=field|input_class %}
+    {% for error in field.errors %}
+      <div class="invalid-feedback">
+        {{ error }}
+      </div>
+    {% endfor %}
     {% if field.help_text %}
       <small class="form-text text-muted">
-        <!--By default Django treats all strings as unsafe, escaping all the special characters that may cause trouble. But in this case, we can trust it.-->
-        {{ field.help_text|safe }} 
+        {{ field.help_text|safe }}
       </small>
     {% endif %}
   </div>
