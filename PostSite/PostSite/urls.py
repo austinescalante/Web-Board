@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import url
 
+from accounts import views as accounts_views
 from boards import views
 #When Django receives a request, it starts searching for a match in the project’s URLconf. 
 # It starts with the first entry of the urlpatterns variable, and test the requested URL against each url entry.
@@ -32,6 +33,7 @@ from boards import views
 #If Django finds a match, it will pass the request to the view function, which is the second parameter of the url
 urlpatterns = [
     path('', views.home,name='home'),
+    url(r'^signup/$', accounts_views.signup, name='signup'),
     re_path(r'^boards/(?P<pk>\d+)/$',views.board_topics,name='board_topics'),
     url(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
     path('admin/', admin.site.urls),

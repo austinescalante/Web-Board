@@ -1,0 +1,18 @@
+body {
+    background-image: url(../img/triangular_@2X.png);
+  }
+  
+  .logo {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-family: 'Roboto Slab', serif;
+  }
+  
+  .logo a {
+    color: rgba(0,0,0,.9);
+  }
+  
+  .logo a:hover,
+  .logo a:active {
+    text-decoration: none;
+  }
+  

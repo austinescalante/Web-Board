@@ -1,0 +1,33 @@
+{% load widget_tweaks %}
+
+{% for field in form %}
+  <div class="form-group">
+    {{ field.label_tag }}
+<!--Field Validation:
+        Initial state: the form has no data (is not bound)
+        Invalid: we add the .is-invalid CSS class and add error messages in an element with a class .invalid-feedback. 
+        The form field and the messages are rendered in red.
+        Valid: we add the .is-valid CSS class so to paint the form field in green, giving feedback to the user that this field is good to go.-->
+    {% if form.is_bound %}
+      {% if field.errors %}
+        {% render_field field class="form-control is-invalid" %}
+        {% for error in field.errors %}
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% else %}
+        {% render_field field class="form-control is-valid" %}
+      {% endif %}
+    {% else %}
+      {% render_field field class="form-control" %}
+    {% endif %}
+
+    {% if field.help_text %}
+      <small class="form-text text-muted">
+        <!--By default Django treats all strings as unsafe, escaping all the special characters that may cause trouble. But in this case, we can trust it.-->
+        {{ field.help_text|safe }} 
+      </small>
+    {% endif %}
+  </div>
+{% endfor %}

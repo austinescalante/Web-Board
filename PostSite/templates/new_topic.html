@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% load widget_tweaks %}
-
 {% block title %}Start a New Topic{% endblock %}
 
 {% block breadcrumb %}
@@ -13,38 +11,7 @@
 {% block content %}
   <form method="post" novalidate>
     {% csrf_token %}
-
-    {% for field in form %}
-      <div class="form-group">
-        {{ field.label_tag }}
-        {% if form.is_bound %}
-        <!--Field Validation:
-        Initial state: the form has no data (is not bound)
-        Invalid: we add the .is-invalid CSS class and add error messages in an element with a class .invalid-feedback. 
-        The form field and the messages are rendered in red.
-        Valid: we add the .is-valid CSS class so to paint the form field in green, giving feedback to the user that this field is good to go.-->
-        {% if field.errors %}
-          {% render_field field class="form-control is-invalid" %}
-          {% for error in field.errors %}
-            <div class="invalid-feedback">
-              {{ error }}
-            </div>
-          {% endfor %}
-
-        {% else %}
-          {% render_field field class="form-control is-valid" %}
-        {% endif %}
-      {% else %}
-        {% render_field field class="form-control" %}
-      {% endif %}
-        {% if field.help_text %}
-          <small class="form-text text-muted">
-            {{ field.help_text }}
-          </small>
-        {% endif %}
-      </div>
-    {% endfor %}
-
+    {% include 'includes/form.html' %}
     <button type="submit" class="btn btn-success">Post</button>
   </form>
 {% endblock %}
